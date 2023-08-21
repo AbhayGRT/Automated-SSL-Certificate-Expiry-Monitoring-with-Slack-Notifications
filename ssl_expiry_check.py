@@ -12,7 +12,7 @@ def get_ssl_expiry(domain):
             return datetime.datetime.strptime(cert['notAfter'], "%b %d %H:%M:%S %Y %Z")
 
 def main():
-    domains = ["example1.com", "example2.com", "example3.com"]  # Add your domains here
+    domains = ["facebook.com", "tesla.com", "google.com"]  # Add your domains here
     for domain in domains:
         expiry_date = get_ssl_expiry(domain)
         remaining_days = (expiry_date - datetime.datetime.now()).days
