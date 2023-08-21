@@ -11,7 +11,6 @@ def get_ssl_expiry(domain):
         with context.wrap_socket(sock, server_hostname=domain) as sslsock:
             cert = sslsock.getpeercert()
             return datetime.datetime.strptime(cert['notAfter'], "%b %d %H:%M:%S %Y %Z")
-
 def main():
     with open('domains.json') as config_file:
         config = json.load(config_file)
@@ -25,7 +24,19 @@ def main():
                 f"* Domain : {domain}\n"
                 f"* Warning : The SSL certificate for {domain} will expire in {remaining_days} days."
             )
-            print(message)
+            
+            payload = {"text": message}
+            slack_webhook_url = os.environ.get("SLACK_WEBHOOK_URL")
+            if slack_webhook_url:
+                response = requests.post(slack_webhook_url, json=payload)
+                print("Response content:", response.content)
+                print("Response status code:", response.status_code)
+                if response.status_code == 200:
+                    print(f"Alert sent for {domain}")
+                else:
+                    print(f"Failed to send alert for {domain}: {response.status_code}")
+            else:
+                print("No Slack webhook URL provided. Skipping alert.")
 
 if __name__ == "__main__":
     main()
